@@ -2,6 +2,7 @@ import com.huaban.analysis.jieba.JiebaSegmenter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -15,11 +16,11 @@ public class check_paper {
     static String falseTxtName = "";
 
     // 余弦相似度
-    private static LinkedHashMap<String, Float[]> wordVector = new LinkedHashMap<String, Float[]>();
+    private static final LinkedHashMap<String, Float[]> wordVector = new LinkedHashMap<>();
 
     // 两个文本的词频
-    private static HashMap<String, HashMap<String, Float>> allFrequency = new HashMap<String, HashMap<String, Float>>();
-    private static HashMap<String, HashMap<String, Integer>> allNormalFrequency = new HashMap<String, HashMap<String, Integer>>();
+    private static final HashMap<String, HashMap<String, Float>> allFrequency = new HashMap<>();
+    private static final HashMap<String, HashMap<String, Integer>> allNormalFrequency = new HashMap<>();
 
     // 选择查重的论文路径
     static String choicePath = "";
@@ -73,8 +74,8 @@ public class check_paper {
 
     // 读取 txt 文本
     public static String readTxt(String file) throws IOException {
-        StringBuffer sb = new StringBuffer();
-        InputStreamReader is = new InputStreamReader(new FileInputStream(file), "utf-8");
+        StringBuilder sb = new StringBuilder();
+        InputStreamReader is = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(is);
         String line = br.readLine(); // 读取文本行
         while(line != null) {
@@ -88,13 +89,13 @@ public class check_paper {
 
     // 分词
     public static String[] participle(String txt) throws IOException {
-        String[] res = null;
+        String[] res;
         JiebaSegmenter Segment = new JiebaSegmenter();
         String temp = Segment.sentenceProcess(txt).toString();
 
         File stopTxt = new File(stopWordsPath);
         List<String> stopWord = FileUtils.readLines(stopTxt,"utf-8");  // 加载停用词
-        List<String> outList = new ArrayList<String>();
+        List<String> outList = new ArrayList<>();
 
         // 返回的分词 [...] 中括号和逗号会被当前字符的一部分，因此需要去除
         res = temp.replaceAll("[\\[\\]\\,]","").split(" ");
@@ -110,27 +111,27 @@ public class check_paper {
 
     // 计算词频
     public static Map<Object, Object> wordFreq(String[] res) {
-        int repeat = 0;
+        int repeat;
         int resLen = res.length;
 
-        HashMap<String, Float> frequency = new HashMap<String, Float>(); // 没有正规化
-        HashMap<String, Integer> normalFrequency = new HashMap<String, Integer>(); // 没有正规化
-        Map<Object, Object> map = new HashMap<Object, Object>();
+        HashMap<String, Float> frequency = new HashMap<>(); // 没有正规化
+        HashMap<String, Integer> normalFrequency = new HashMap<>(); // 没有正规化
+        Map<Object, Object> map = new HashMap<>();
 
         for(int i = 0; i < resLen; i++) {
             repeat = 0; // 某个词的重复次数
 
-            if(res[i] != "") {
+            if(!res[i].equals("")) {
                 repeat++;
                 for(int j = i + 1; j < resLen; j++) {
-                    if(res[j] != "" && res[i].equals(res[j])) {
+                    if(!res[j].equals("") && res[i].equals(res[j])) {
                         res[j] = "";
                         repeat++;
                     }
                 }
 
                 // 某一单词遍历结束，计算词频
-                frequency.put(res[i], (new Float(repeat)) / resLen);
+                frequency.put(res[i], ((float) repeat) / resLen);
                 normalFrequency.put(res[i], repeat);
 
                 map.put("frequency", frequency);
@@ -145,8 +146,8 @@ public class check_paper {
     // 获取两篇论文词频
     public static void AllWordFreq(String originName, String falseTxtName) throws IOException {
         // 词典，存放各个文本的关键字和词频
-        HashMap<String, Float> dict = new HashMap<String, Float>();
-        HashMap<String, Float> falseDict = new HashMap<String, Float>();
+        HashMap<String, Float> dict;
+        HashMap<String, Float> falseDict;
 
         dict = (HashMap<String, Float>) wordFreq(participle(readTxt(truePath))).get("frequency");
         falseDict = (HashMap<String, Float>) wordFreq(participle(readTxt(choicePath))).get("frequency");
@@ -157,8 +158,8 @@ public class check_paper {
     }
     public static void AllNormalWordFreq(String originName, String falseTxtName) throws IOException {
         // 词典，存放各个文本的关键字和词频
-        HashMap<String, Integer> dict = new HashMap<String, Integer>();
-        HashMap<String, Integer> falseDict = new HashMap<String, Integer>();
+        HashMap<String, Integer> dict;
+        HashMap<String, Integer> falseDict;
 
         dict = (HashMap<String, Integer>) wordFreq(participle(readTxt(truePath))).get("normalFrequency");
         falseDict = (HashMap<String, Integer>) wordFreq(participle(readTxt(choicePath))).get("normalFrequency");
@@ -178,8 +179,8 @@ public class check_paper {
         key.add(originName);
         key.add(falseTxtName);
 
-        Map<String, Float> idf = new HashMap<String, Float>();
-        List<String> totalWord = new ArrayList<String>(); // 存储两个文本的关键词
+        Map<String, Float> idf = new HashMap<>();
+        List<String> totalWord = new ArrayList<>(); // 存储两个文本的关键词
         Map<String, HashMap<String, Integer>> totalFreq = allNormalFrequency; // 存储各个文本的 tf
 
         for(int i = 0; i < D; i++) {
@@ -190,7 +191,7 @@ public class check_paper {
                     for (int k = 0; k < D; k++) {
                         if (k != i) {
                             HashMap<String, Integer> temp2 = totalFreq.get(key.get(k));
-                            if (temp2.keySet().contains(word)) {
+                            if (temp2.containsKey(word)) {
                                 totalWord.add(word);
                                 Dt = Dt + 1;
                             }
@@ -235,16 +236,16 @@ public class check_paper {
         Float[] falseArr = wordVector.get(falseTxtName);
         int length = originArr.length;
 
-        Float originModulus = 0.00f; // 向量1的模
-        Float falseModulus = 0.00f; // 向量2的模
-        Float totalModulus = 0f;
+        float originModulus = 0.00f; // 向量1的模
+        float falseModulus = 0.00f; // 向量2的模
+        float totalModulus = 0f;
 
         for (int i = 0; i < length; i++) {
             originModulus += originArr[i] * originArr[i];
             falseModulus += falseArr[i] * falseArr[i];
             totalModulus += originArr[i] * falseArr[i];
         }
-        Float result = (float)Math.sqrt(originModulus * falseModulus);
+        float result = (float)Math.sqrt(originModulus * falseModulus);
 
         DecimalFormat df = new DecimalFormat("0.00");
         return df.format(totalModulus / result);
@@ -268,7 +269,7 @@ public class check_paper {
         }
 
         FileOutputStream fos = new FileOutputStream(file);
-        OutputStreamWriter output = new OutputStreamWriter(fos, "utf-8");
+        OutputStreamWriter output = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
         output.write("论文原文的绝对路径：" + truePath + "\n");
         output.write("抄袭版论文的绝对路径：" + choicePath + "\n");
         output.write(originName + " 和 " + falseTxtName + " 的查重率为：" + result);
