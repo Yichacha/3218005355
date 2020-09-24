@@ -7,15 +7,14 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class check_paper {
-    // 原版论文路径
-    static String truePath = "";
-    // 选择查重的论文路径
-    static String choicePath = "";
-    static String resultPath = "";
     static String[] paths = {};
 
-    // 停用词文本路径
-    static final String stopWordsPath = "D:\\IDEA\\check_paper\\src\\paper\\stopWords.txt";
+    static String truePath = "";
+    static String choicePath = ""; // 选择查重的论文路径
+    static String resultPath = ""; // 答案文件路径
+
+
+
     // 文本名
     static final String originName = "orig.txt";
     static String falseTxtName = "";
@@ -44,6 +43,7 @@ public class check_paper {
 
             System.out.println("请输入抄答案文件的绝对路径：");
             resultPath = scanner.nextLine();
+
         }
     }
 
@@ -75,19 +75,8 @@ public class check_paper {
         JiebaSegmenter Segment = new JiebaSegmenter();
         String temp = Segment.sentenceProcess(txt).toString();
 
-        File stopTxt = new File(stopWordsPath);
-        List<String> stopWord = FileUtils.readLines(stopTxt,"utf-8");  // 加载停用词
-        List<String> outList = new ArrayList<>();
-
         // 返回的分词 [...] 中括号和逗号会被当前字符的一部分，因此需要去除
         res = temp.replaceAll("[\\[\\]\\,]","").split(" ");
-
-        // 过滤停用词
-        for(String word : res) { // 将 String[] 数组转成 List 集合
-            outList.add(word);
-        }
-        outList.removeAll(stopWord); // 去除停用词
-        res = outList.toArray(new String[outList.size()]); // 将 List 转换为 String[]
         return res;
     }
 
