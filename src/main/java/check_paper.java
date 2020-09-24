@@ -209,11 +209,11 @@ public class check_paper {
         Map<String, Float> idf = idf(originName, falseTxtName);
         AllWordFreq(originName, falseTxtName);
 
-        for (String key : allFrequency.keySet()) {
+        for (String freq : allFrequency.keySet()) {
             int index = 0;
-            int length = idf.size();
-            Float[] arr = new Float[length];
-            Map<String, Float> temp = allFrequency.get(key);
+            int idfLen = idf.size();
+            Float[] arr = new Float[idfLen];
+            Map<String, Float> temp = allFrequency.get(freq);
 
             for (String word : temp.keySet()) {
                 temp.put(word, idf.get(word) * temp.get(word));
@@ -223,7 +223,7 @@ public class check_paper {
                 arr[index] = temp.get(word) != null ? temp.get(word) : 0f;
                 index++;
             }
-            wordVector.put(key, arr);
+            wordVector.put(freq, arr);
         }
     }
 
@@ -250,7 +250,7 @@ public class check_paper {
         return df.format(totalModulus / result);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         // 选择查重的论文路径
         choicePath = indicator();
         String result = conSim(originName, falseTxtName);
@@ -275,6 +275,5 @@ public class check_paper {
 
         output.close();
         fos.close();
-//        Thread.sleep(100000);
     }
 }
