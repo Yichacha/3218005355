@@ -1,3 +1,3 @@
 论文原文的绝对路径：D:\IDEA\check_paper\src\paper\orig.txt
-抄袭版论文的绝对路径：D:\IDEA\check_paper\src\paper\orig_0.8_dis_15.txt
-orig.txt 和 orig_0.8_dis_15.txt 的查重率为：0.36
+抄袭版论文的绝对路径：D:\IDEA\check_paper\src\paper\orig_0.8_add.txt
+论文的查重率为：0.71

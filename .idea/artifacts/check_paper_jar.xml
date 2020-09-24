@@ -1,0 +1,15 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="check_paper:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/check_paper_jar</output-path>
+    <root id="archive" name="check_paper.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/jar/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="check_paper" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Maven/Maven-checkPaper/org/apache/lucene/lucene-core/2.4.1/lucene-core-2.4.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Maven/Maven-checkPaper/com/huaban/jieba-analysis/1.0.2/jieba-analysis-1.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Maven/Maven-checkPaper/org/apache/commons/commons-lang3/3.3.1/commons-lang3-3.3.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Maven/Maven-checkPaper/commons-io/commons-io/2.6/commons-io-2.6.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

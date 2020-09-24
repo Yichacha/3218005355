@@ -8,7 +8,12 @@ import java.util.*;
 
 public class check_paper {
     // 原版论文路径
-    static final String truePath = "D:\\IDEA\\check_paper\\src\\paper\\orig.txt";
+    static String truePath = "";
+    // 选择查重的论文路径
+    static String choicePath = "";
+    static String resultPath = "";
+    static String[] paths = {};
+
     // 停用词文本路径
     static final String stopWordsPath = "D:\\IDEA\\check_paper\\src\\paper\\stopWords.txt";
     // 文本名
@@ -22,68 +27,45 @@ public class check_paper {
     private static final HashMap<String, HashMap<String, Float>> allFrequency = new HashMap<>();
     private static final HashMap<String, HashMap<String, Integer>> allNormalFrequency = new HashMap<>();
 
-    // 选择查重的论文路径
-    static String choicePath = "";
-
     // 操作指示
-    public static String indicator() {
-        // 选择查重的论文路径前缀
-        String choicePath = "D:\\IDEA\\check_paper\\src\\paper\\";
-
-        System.out.println("请选择查重的论文：");
-        System.out.println("1、orig_0.8_add.txt");
-        System.out.println("2、orig_0.8_del.txt");
-        System.out.println("3、orig_0.8_dis_1.txt");
-        System.out.println("4、orig_0.8_dis_10.txt");
-        System.out.println("5、orig_0.8_dis_15.txt");
-
-        Scanner scanner = new Scanner(System.in);
-
-        if(scanner.hasNextInt()) {
-            int in = scanner.nextInt();
-            if(in <1 || in > 5) {
-                System.out.println("请输入数字 1-5");
-                indicator();
-            } else {
-                switch (in) {
-                    case 1:
-                        falseTxtName = "orig_0.8_add.txt";
-                        break;
-                    case 2:
-                        falseTxtName = "orig_0.8_del.txt";
-                        break;
-                    case 3:
-                        falseTxtName = "orig_0.8_dis_1.txt";
-                        break;
-                    case 4:
-                        falseTxtName = "orig_0.8_dis_10.txt";
-                        break;
-                    case 5:
-                        falseTxtName = "orig_0.8_dis_15.txt";
-                        break;
-                }
-            }
+    public static void indicator(String[] paths) {
+        if (paths != null && paths.length != 0) {
+            truePath = paths[0];
+            choicePath = paths[1];
+            resultPath = paths[2];
         } else {
-            System.out.println("请输入有效数据");
-            indicator();
-        }
+            Scanner scanner = new Scanner(System.in);
 
-        choicePath += falseTxtName;
-        return choicePath;
+            System.out.println("请输入论文原文的绝对路径：");
+            truePath = scanner.nextLine();
+
+            System.out.println("请输入抄袭版论文的绝对路径：");
+            choicePath = scanner.nextLine();
+
+            System.out.println("请输入抄答案文件的绝对路径：");
+            resultPath = scanner.nextLine();
+        }
     }
 
     // 读取 txt 文本
     public static String readTxt(String file) throws IOException {
         StringBuilder sb = new StringBuilder();
-        InputStreamReader is = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(is);
-        String line = br.readLine(); // 读取文本行
-        while(line != null) {
-            // 去除符号，并添加到字符流中
-            sb.append(line.replaceAll("[\\pP\\pS\\pZ]", ""));
-            line = br.readLine();
+
+        try {
+            InputStreamReader is = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(is);
+            String line = br.readLine(); // 读取文本行
+            while(line != null) {
+                // 去除符号，并添加到字符流中
+                sb.append(line.replaceAll("[\\pP\\pS\\pZ]", ""));
+                line = br.readLine();
+            }
+            br.close();
+        } catch (IOException e) {
+            System.out.println("请检查输入的路径是否正确！");
+            System.out.println(e);
+            indicator(paths);
         }
-        br.close();
         return sb.toString();
     }
 
@@ -229,7 +211,7 @@ public class check_paper {
     }
 
     // 使用余弦相似度匹配
-    public static String conSim(String originName, String falseTxtName) throws IOException {
+    public static String cosSim(String originName, String falseTxtName) throws IOException {
         tfidf(originName, falseTxtName);
 
         Float[] originArr = wordVector.get(originName);
@@ -252,15 +234,13 @@ public class check_paper {
     }
 
     public static void main(String[] args) throws IOException {
-        // 选择查重的论文路径
-        choicePath = indicator();
-        String result = conSim(originName, falseTxtName);
-        System.out.println("论文原文的绝对路径：");
-        System.out.println(truePath);
-        System.out.println("抄袭版论文的绝对路径：");
-        System.out.println(choicePath);
+        paths = args;
 
-        File file = new File("D:\\IDEA\\check_paper\\src\\paper\\result.txt");
+        // 选择查重的论文路径
+        indicator(paths);
+        String result = cosSim(originName, falseTxtName);
+
+        File file = new File(resultPath);
         if(file.exists()) { // 判断文件是否存在
             System.out.println("查重结果请查看 result.txt 文件");
         } else {
@@ -272,7 +252,7 @@ public class check_paper {
         OutputStreamWriter output = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
         output.write("论文原文的绝对路径：" + truePath + "\n");
         output.write("抄袭版论文的绝对路径：" + choicePath + "\n");
-        output.write(originName + " 和 " + falseTxtName + " 的查重率为：" + result);
+        output.write("论文的查重率为：" + result);
 
         output.close();
         fos.close();
