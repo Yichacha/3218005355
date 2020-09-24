@@ -1,0 +1,32 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="check_paper:war exploded">
+    <output-path>$PROJECT_DIR$/target/check_paper</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <exploded>true</exploded>
+        <module>check_paper</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="check_paper" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.apache.lucene:lucene-core:2.4.1" />
+          <element id="library" level="project" name="Maven: com.huaban:jieba-analysis:1.0.2" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.3.1" />
+          <element id="library" level="project" name="Maven: commons-io:commons-io:2.6" />
+          <element id="archive" name="check_paper-1.0-SNAPSHOT.jar">
+            <element id="module-output" name="check_paper" />
+          </element>
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/check_paper/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="check_paper/web/Web" />
+    </root>
+  </artifact>
+</component>
